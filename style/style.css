@@ -18,7 +18,97 @@ table{
     flex-direction: row;
 }
 #app{
-    display: flex;
+    display: flex;body {
+        background-color: #008B8B;
+        margin: 0;
+        padding: 0;
+    }
+    
+    table{
+        border: 2px solid black;
+    }
+    .column {
+        height: max-content;
+        padding: 10px;
+    }
+    
+    
+    #task2{
+        position: absolute;
+        top: 400px;
+        display: flex;
+        flex-direction: row;
+    }
+    
+    #app{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 200px;
+    }
+    .add {
+        background-color: #20B2AA;
+        width: 90%;
+        height: 335px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;   
+    }
+    
+    input {
+        background-color: #AFEEEE;
+        border: none;
+        height: 25px;
+        border-radius: 5px;
+    }
+    textarea {
+        background-color: #AFEEEE;
+        border: none;
+        border-radius: 5px;
+    }
+    .create {
+        background-color: #66CDAA;
+        border: none;
+        border-radius: 5px;
+        height: 40px;
+        width: 105px;
+        margin-left: 10px;
+    }
+    button {
+        background-color: #66CDAA;
+        border: none;
+        border-radius: 5px;
+    }
+    
+    #coll {
+        background-color: #66cdab9d;
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 10px;
+        height: 360px;
+        width: 250px;
+    }
+    .important {
+        color: #8B0000;
+        background-color: #cfcdcc51;
+        border-radius: 3px;
+    }
+    .general {
+        color: #AFEEEE;
+    }
+    .comment {
+        color: #8B0000;
+    }
+    .comlited {
+        color: #4a614a;
+    }
+    
+    .manipulation {
+        display: flex;
+    }
     flex-direction: row;
     justify-content: center;
     gap: 200px;

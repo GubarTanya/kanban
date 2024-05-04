@@ -45,7 +45,8 @@ Vue.component('add-task', {
                 date: this.task.date,
                 time: this.task.time,
                 importance: this.task.importance,
-                deadline_date: this.task.deadline_date
+                deadline_date: this.task.deadline_date,
+                createdAt: new Date() // Добавляем дату создания задачи
             };
             this.$emit('add-task', productReview);
             location.reload()
@@ -87,7 +88,6 @@ Vue.component('column', {
         :task="task"
         @del-task="delTask"
         @move-task="move"
-        @movee-task="movee"
         @drop-task="dropTask"
         @update-task="updateTask">
         
@@ -106,9 +106,6 @@ Vue.component('column', {
         },
         move(task) {
             this.$emit('move-task', { task, column: this.column });
-        },
-        movee(task) {
-            this.$emit('movee-task', { task, column: this.column });
         },
         delTask(task){
             this.$emit('del-task', task);
@@ -141,6 +138,7 @@ Vue.component('task', {
             <span v-if="!task.isEditing">{{ subtask.title }}</span>
             <textarea v-if="task.isEditing" v-model="subtask.title" placeholder="Subtask description"></textarea>
         </p>
+        <p>Дата создания: {{ task.createdAt }}</p>
         <p>Дата изменения: {{ task.time }} - {{ task.date }}</p>
         <p>Дата сдачи: {{ task.deadline_date }}</p>
         <h3 class="important" v-if="task.importance === 1">важный</h3>
@@ -151,7 +149,7 @@ Vue.component('task', {
         <div class="manipulation" v-if="!isLastColumn">
             <button v-if="isFirstColumn" @click="delTask">Удалить задачу</button>
             <div v-if="this.$parent.column.index !== 2">
-                <button @click="movee"><--</button>
+                <button @click="move"><--</button>
             </div>
             <div v-if="this.$parent.column.index === 2">
                 <button @click="returnToActive"><--</button>
@@ -184,7 +182,7 @@ Vue.component('task', {
                     this.$set(this.task, 'returnReason', []); // Инициализация как пустого массива
                 }
                 this.task.returnReason.push(reason); 
-                this.$emit('movee-task', { task: this.task, column: this.$parent.column });
+                this.$emit('move-task', { task: this.task, column: this.$parent.column });
             }
         },
         delTask(task){
@@ -193,9 +191,7 @@ Vue.component('task', {
         move() {
             this.$emit('move-task', { task: this.task, column: this.$parent.column });
         },
-        movee() {
-            this.$emit('movee-task', { task: this.task, column: this.$parent.column });
-        },
+       
     },
     computed: {
         isLastColumn() {
@@ -258,7 +254,7 @@ let app = new Vue({
                     this.$set(task, 'returnReason', []);
                 }
                 task.returnReason.push(reason);
-                this.$emit('movee-task', { task: task, column: column });
+                this.$emit('move-task', { task: task, column: column });
             }
         },
         dropTask({ taskData, column }) {
@@ -316,15 +312,6 @@ let app = new Vue({
                 this.save();
             }
         },
-        movee(data) {
-            data.task.task.time = new Date().getHours() + ':' + new Date().getMinutes() + ':' +new Date().getSeconds()
-            data.task.task.date = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
-            const fromColumn = this.columns[data.column.index];
-            const toColumn = this.columns[data.column.index - 1];
-            if (toColumn) {
-                toColumn.tasks.push(fromColumn.tasks.splice(fromColumn.tasks.indexOf(data.task), 1)[0]);
-                this.save();
-            }
-        },
+        
     },
 })

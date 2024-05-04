@@ -160,7 +160,7 @@ Vue.component('task', {
             <button @click="toggleEditing">{{ task.isEditing ? 'Save' : 'Редактировать' }}</button>
         </div>
         <div v-if="isLastColumn">
-            <p v-if="isTaskOverdue">Expired</p>
+            <p v-if="isTaskOverdue">Сделано не в срок!</p>
             <p class="comlited" v-else>Сделано вовремя!</p>
         </div>
     </div>

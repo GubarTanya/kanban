@@ -11,3 +11,15 @@ table{
     height: max-content;
     padding: 10px;
 }
+#task2{
+    position: absolute;
+    top: 400px;
+    display: flex;
+    flex-direction: row;
+}
+#app{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 200px;
+}

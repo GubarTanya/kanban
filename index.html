@@ -15,6 +15,17 @@
     <div class="add">
         <add-task @add-task="addTask"></add-task>
     </div>
-    
+    <div id="task2">
+        <column v-for="(column, index) in columns" :key="index"
+                :column="column"
+                :class="{disabled:column.disabled}"
+                @del-task="delTask"
+                @move-task="move"
+                @move-task2="move2"
+                @drop-task="dropTask"
+                @save="save"
+        ></column>
+    </div>
+</div>
 </body>
 </html>

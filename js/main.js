@@ -68,6 +68,148 @@ Vue.component('add-task', {
     },
 })
 
+Vue.component('column', {
+    props: {
+        column: {
+            title: '',
+            tasks: [],
+            date: '',
+            deadline_date: '',
+        }
+    },
+    template: `
+        <div class="column" @dragover.prevent @drop="dropTask">
+    <div class="column">
+        <h2>{{column.title}}</h2>
+        <div class="task">
+        <task v-for="(task, index) in sortedTasks"
+        :key="index"
+        :task="task"
+        @del-task="delTask"
+        @move-task="move"
+        @move-task2="move2"
+        @drop-task="dropTask"
+        @update-task="updateTask">
+        
+    </task>
+        </div>
+    </div>
+    </div>
+    `,
+    updated() {
+        this.$emit('save')
+    },
+    methods: {
+        dropTask(event) {
+            const taskData = JSON.parse(event.dataTransfer.getData('task'));
+            this.$emit('drop-task', { taskData, column: this.column });
+        },
+        move(task) {
+            this.$emit('move-task', { task, column: this.column });
+        },
+        move2(task) {
+            this.$emit('move-task2', { task, column: this.column });
+        },
+        delTask(task){
+            this.$emit('del-task', task);
+        },
+        updateTask(task) {
+            this.$emit('save');
+        },
+    },
+    computed: {
+        sortedTasks() {
+            return this.column.tasks.sort((a, b) => b.importance - a.importance);
+        },
+    }
+})
+
+Vue.component('task', {
+    props: {
+        task: {
+            title: '',
+            subtasks: [],
+            importance: '',
+            returnReason: []
+        }
+    },
+    template: `
+        <div :class="{task2: isFirstColumn}" id="coll" draggable="true" @dragstart="dragStart">
+        <h2 v-if="!task.isEditing">{{ task.title }}</h2>
+        <input v-if="task.isEditing" v-model="task.title" placeholder="Task title" />
+        <p v-for="(subtask, index) in task.subtasks" class="subtask" :key="index">
+            <span v-if="!task.isEditing">{{ subtask.title }}</span>
+            <textarea v-if="task.isEditing" v-model="subtask.title" placeholder="Subtask description"></textarea>
+        </p>
+        <p>Дата изменения: {{ task.time }} - {{ task.date }}</p>
+        <p>Дата сдачи: {{ task.deadline_date }}</p>
+        <h3 class="important" v-if="task.importance === 1">важный</h3>
+        <h3 class="general" v-else>oбщий</h3>
+        <div class="comment" v-if="this.$parent.column.index === 1">
+            <p v-if="task.returnReason !== '' ">{{ task.returnReason }}</p>
+        </div>
+        <div class="manipulation" v-if="!isLastColumn">
+            <button v-if="isFirstColumn" @click="delTask">Удалить задачу</button>
+            <div v-if="this.$parent.column.index !== 2">
+                <button @click="move2"><--</button>
+            </div>
+            <div v-if="this.$parent.column.index === 2">
+                <button @click="returnToActive"><--</button>
+            </div>
+            <button @click="move">--></button>
+            <button @click="toggleEditing">{{ task.isEditing ? 'Save' : 'Редактировать' }}</button>
+        </div>
+        <div v-if="isLastColumn">
+            <p v-if="isTaskOverdue">Expired</p>
+            <p class="comlited" v-else>Сделано вовремя!</p>
+        </div>
+    </div>
+    `,
+    methods: {
+        dragStart(event) {
+            event.dataTransfer.setData('task', JSON.stringify(this.task));
+        },
+        toggleEditing() {
+            this.task.isEditing = !this.task.isEditing;
+            this.task.time = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds();
+            this.task.date = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
+            this.$emit('update-task', this.task);
+            location.reload()
+            localStorage.setItem('task_' + this.task.title + '_isEditing', this.task.isEditing);
+        },
+        returnToActive() {
+            const reason = prompt("Укажите причину возврата задания:");
+            if (reason) {
+                if (!this.task.returnReason) {
+                    this.$set(this.task, 'returnReason', []); // Инициализация returnReason как пустого массива
+                }
+                this.task.returnReason.push(reason); // Добавление причины в массив returnReason
+                this.$emit('move-task2', { task: this.task, column: this.$parent.column });
+            }
+        },
+        delTask(task){
+            this.$emit('del-task', task);
+        },
+        move() {
+            this.$emit('move-task', { task: this.task, column: this.$parent.column });
+        },
+        move2() {
+            this.$emit('move-task2', { task: this.task, column: this.$parent.column });
+        },
+    },
+    computed: {
+        isLastColumn() {
+            return this.$parent.column.index === 3;
+        },
+        isFirstColumn() {
+            return this.$parent.column.index === 0;
+        },
+        isTaskOverdue() {
+            return new Date(this.task.date) > new Date(this.task.deadline_date);
+        },
+    }
+})
+
 let app = new Vue({
     el: '#app',
     data: {
